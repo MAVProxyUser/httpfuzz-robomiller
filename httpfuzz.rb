@@ -5,6 +5,9 @@ include WEBrick
 require "rubygems"
 require "sqlite3"
 
+Encoding.default_external = Encoding::UTF_8
+Encoding.default_internal = Encoding::UTF_8
+
 #$db = SQLite3::Database.new( ARGV[3] )
 #sql = <<SQL
 #create table the_table (
@@ -22,7 +25,7 @@ require "sqlite3"
 $pimpme = ""
 
 REDIR_LOVE =
-"<img src=\"/fuzz.#{ARGV[1]}\" >fuzz</img><meta http-equiv=\"REFRESH\" content=\"1;url=/\">"
+"<img src=\"/fuzz.#{ARGV[1]}\" ><br>fuzz</img><meta http-equiv=\"REFRESH\" content=\".5;url=/\">"
 #"<iframe src=\"/fuzz.#{ARGV[1]}\" width=\"100%\" height=\"300\"></iframe>fuzz<meta http-equiv=\"REFRESH\" content=\"0;url=/\">"
 
 File.open("index.html", 'w') {|f| f.write(REDIR_LOVE) }
@@ -60,12 +63,12 @@ class FUZZ < HTTPServlet::AbstractServlet
 #	fuzzfactor = 29000
 #	fuzzfactor = 59000
 	buflen = testbuf.length
-	puts "bufflen is #{buflen}"
+	#puts "bufflen is #{buflen}"
 	
 	xFactor = (buflen.to_f / fuzzfactor).ceil
-	puts "xFactor is #{xFactor}"
+	#puts "xFactor is #{xFactor}"
 	numwritesrange=(0..xFactor).to_a
-	numwrites=numwritesrange.choice+1
+	numwrites=numwritesrange.sample+1
 	#puts "numwritesrange is #{numwritesrange}"
 
 	rbyterange = (0..255).to_a
@@ -76,10 +79,10 @@ class FUZZ < HTTPServlet::AbstractServlet
 	modded = ""
 	numwrites.times do |i|
 
-	        rbyte = rbyterange.choice
+	        rbyte = rbyterange.sample
 	        rchar = sprintf("%c", rbyte)    
-	        rn = randoffsetrange.choice
-	        puts "random byte #{rn} is #{rbyte.to_s(16)}"
+	        rn = randoffsetrange.sample
+	        #puts "random byte #{rn} is #{rbyte.to_s(16)}"
 		
 		modded = modded + "random byte #{rn} is #{rbyte.to_s(16)} "  		
 	
@@ -102,8 +105,8 @@ class FUZZ < HTTPServlet::AbstractServlet
 
 	#$db.execute( "insert into the_table values ( ?, ?, ?, ?)", ARGV[0], $pimpme, fuzzfactor, modded)
 
-	puts "--> Writing #{$pimpme}"
-	File.open($pimpme, 'w') {|f| f.write(testbuf) }
+#	#puts "--> Writing #{$pimpme}"
+#	File.open($pimpme, 'w') {|f| f.write(testbuf) }
  end
 end
 
@@ -112,4 +115,5 @@ s.mount("/", REDIRECT)
 s.mount("/fuzz.#{ARGV[1]}", FUZZ)
 
 s.start
+
 
