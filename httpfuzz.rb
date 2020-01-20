@@ -30,7 +30,7 @@ s = HTTPServer.new(
 :Port => ARGV[2], 
 Logger: WEBrick::Log.new("/dev/null"),
 AccessLog: [],
-:DocumentRoot     => "/Users/kfinisterre/Desktop/" 
+:DocumentRoot     => "./" 
 
 )
 
