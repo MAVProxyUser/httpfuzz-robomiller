@@ -1,26 +1,22 @@
+# Usage: 
+# ruby httpfuzz.rb <imagefile> <extension> <port> <fuzzfactor>
+# ruby httpfuzz.rb source.gif gif 8080 30000
+# https://github.com/MAVProxyUser/httpfuzz-robomiller
+# based on cmiller-csw-2010.pdf Babysitting an Army of Monkeys 
+# https://fuzzinginfo.files.wordpress.com/2012/05/cmiller-csw-2010.pdf
+
 require 'webrick'
 include WEBrick
-
-
 require "rubygems"
-require "sqlite3"
+
+if ARGV.length < 4
+  puts "Too few arguments"
+  puts "Usage: ruby httpfuzz.rb <imagefile> <extension> <port> <fuzzfactor>"
+  exit
+end
 
 Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
-
-#$db = SQLite3::Database.new( ARGV[3] )
-#sql = <<SQL
-#create table the_table (
-#file varchar2(30),
-#date varchar2(30),
-#fuzzfactor varchar2(30),
-#modded  varchar2(30)
-
-#);
-
-#SQL
-
-#$db.execute_batch( sql )
 
 $pimpme = ""
 
@@ -32,7 +28,10 @@ File.open("index.html", 'w') {|f| f.write(REDIR_LOVE) }
 
 s = HTTPServer.new( 
 :Port => ARGV[2], 
+Logger: WEBrick::Log.new("/dev/null"),
+AccessLog: [],
 :DocumentRoot     => "/Users/kfinisterre/Desktop/" 
+
 )
 
 class REDIRECT < HTTPServlet::AbstractServlet
@@ -52,6 +51,7 @@ class FUZZ < HTTPServlet::AbstractServlet
 	    testbuf = f.read
 	}
 
+	# Play around with this number to impact the number of writes 
 	fuzzfactor = ARGV[3].to_i
 #	fuzzfactor = 1000
 #	fuzzfactor = 1500
@@ -103,9 +103,7 @@ class FUZZ < HTTPServlet::AbstractServlet
 
 	modded = modded + " numwrites is #{numwrites}"
 
-	#$db.execute( "insert into the_table values ( ?, ?, ?, ?)", ARGV[0], $pimpme, fuzzfactor, modded)
-
-#	#puts "--> Writing #{$pimpme}"
+	# Don't save the file! do so selectively 
 #	File.open($pimpme, 'w') {|f| f.write(testbuf) }
  end
 end
